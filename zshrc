@@ -117,40 +117,10 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export http_proxy="http://proxy.open.ch:8080"
-export https_proxy="http://proxy.open.ch:8080"
-export no_proxy=".open.ch"
 
-export GOPATH=/Users/sek/go/
-
-export PATH=~/.scripts:$PATH
+source ~/.zshrc_osag
 
 source ~/perl5/perlbrew/etc/bashrc
-
-function upload_pkg_files_to_host {
-    HOST="$1"    
-    TMP=`ssh lamarr "mktemp -d -p /shared/tmp rsync.sek.XXXXXXXX"`
-  
-    for FILE in "${@:2}"; do
-        NEW_PATH=`grealpath $FILE | sed -e 's!.*pkg-osag!/opt/OSAG!'`               # path replacement from local path to host path
-
-        NEW_PATH=`echo "$NEW_PATH" | sed -e 's!\(OSAGnurs3/\)addon!\1etc!'`         # path replacement for OSAGnurs3 addon files
-        NEW_PATH=`echo "$NEW_PATH" | sed -e 's!\(OSAGnurs3/\)nurse/lib!\1perl!'`    # path replacement for OSAGnurs3 lib files
-
-        NEW_PATH=`echo "$NEW_PATH" | sed -e 's!\(OSAGrad/\)addon!\1!'`              # path replacement for OSAGrad addon files
-        rsync -avz --quiet $FILE lamarr:$TMP
-
-        ssh lamarr "rsync -rlt --checksum -vz --no-perms --no-owner --no-group --quiet $TMP/$(basename $FILE) $HOST:$NEW_PATH"
-    done
-    ssh lamarr "rm -rf $TMP"
-}
-
-function copy_to_host {
-    TMP=`ssh lamarr "mktemp -d -p /shared/tmp rsync.sek.XXXXXXXX"`
-    rsync -avz --quiet $1 lamarr:$TMP;
-    ssh lamarr "rsync -rlt --checksum -vz --no-perms --no-owner --no-group --quiet $TMP/ $2";
-    ssh lamarr "rm -rf $TMP";
-}
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
