@@ -27,4 +27,8 @@ function copy_to_host {
     ssh lamarr "rm -rf $TMP";
 }
 
+export PATH=/Users/sek/.host_sync:$PATH
+
 export GOPATH=/Users/sek/go/
+
+source ~/perl5/perlbrew/etc/bashrc

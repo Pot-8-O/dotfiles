@@ -118,9 +118,6 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 
+source ~/.zshrc_osx
 source ~/.zshrc_osag
-
-source ~/perl5/perlbrew/etc/bashrc
-
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
