@@ -28,7 +28,7 @@ function copy_to_host {
 }
 
 export PATH=/Users/sek/.host_sync:$PATH
-
+echo $P
 export GOPATH=/Users/sek/go/
 
 source ~/perl5/perlbrew/etc/bashrc

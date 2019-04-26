@@ -117,6 +117,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+abspath() { for f in "$@"; do echo ${f}(:A); done }
 
 source ~/.zshrc_osx
 source ~/.zshrc_osag
