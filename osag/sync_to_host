@@ -1,0 +1,112 @@
+#!perl -w
+
+#######################################################################################################################
+#
+# sync_to_host
+#       sync local directory named after osag host via jump to that host (using rsync).
+#       local directory can be filled with folder structure of the target.
+#       local directory can be filled with files and symlink, which will be copied as data, not as links
+#           (-L, --copy-links) in rsync
+#
+#   folder structure should look like:
+#   .
+#   ├── hosts
+#   │   ├── host1_name
+#   │   │   └── absolute
+#   │   │       └── path
+#   │   │           └── to
+#   │   │               └── file
+#   │   │                   └── on
+#   │   │                       └── host1
+#   │   └── host2_name
+#   │       └── absolute
+#   │           └── path
+#   │               └── on
+#   │                   └── host2
+#   └── sync_to_host
+#
+# Written by Severin Kistler <skistler@open-systems.com>, April 2019
+#
+#######################################################################################################################
+
+
+use v5.16;
+use warnings;
+
+use Const::Fast;
+use Data::Dumper;
+use File::Basename;
+use File::Slurper;
+use Method::Signatures;
+
+# CONSTANTS ------------------------------------------------------------------------------------------------------------
+
+const my $JUMP_HOST        => "lamarr";
+const my $TARGET_HOSTS_DIR => dirname(__FILE__) . "/hosts/";
+
+#-----------------------------------------------------------------------------------------------------------------------
+# main()
+#-----------------------------------------------------------------------------------------------------------------------
+func main (Str $target_host) {
+    my $source_dir   = _check_target_hosts($target_host);
+    my $jump_tmp_dir = _get_tmp_dir($JUMP_HOST);
+
+    #say($jump_tmp_dir);
+    _source_to_jump( $source_dir, $JUMP_HOST, $jump_tmp_dir );
+    _jump_to_target( $JUMP_HOST, $jump_tmp_dir, $target_host, "/" );
+
+    _rm_jump_tmp_dir( $JUMP_HOST, $jump_tmp_dir );
+}
+
+#-----------------------------------------------------------------------------------------------------------------------
+# _check_target_hosts()
+#-----------------------------------------------------------------------------------------------------------------------
+func _check_target_hosts (Str $target_host) {
+    my @hosts = grep { -e ( $TARGET_HOSTS_DIR . $_ ) } File::Slurper::read_dir($TARGET_HOSTS_DIR);
+
+    #say( Dumper( \@hosts ) );
+    if ( !grep { $_ eq $target_host } @hosts ) {
+        die("No directory in '$TARGET_HOSTS_DIR' for requested host '$target_host'.");
+    }
+
+    #say("Directory in '$TARGET_HOSTS_DIR' for requested host '$target_host' found.");
+    return $TARGET_HOSTS_DIR . $target_host;
+}
+
+#-----------------------------------------------------------------------------------------------------------------------
+# _source_to_jump()
+#-----------------------------------------------------------------------------------------------------------------------
+func _source_to_jump (Str $src, Str $jump_host, Str $jump_tmp_dir) {
+    `rsync -atzPL $src $jump_host:$jump_tmp_dir`;
+}
+
+#-----------------------------------------------------------------------------------------------------------------------
+# _jump_to_target()
+#-----------------------------------------------------------------------------------------------------------------------
+func _jump_to_target (Str $jump_host, Str $jump_tmp_dir, Str $target_host, $target_dir) {
+
+    #say("$jump_tmp_dir/$target_host");
+    #say("$target_host:$target_dir");
+
+    `ssh $jump_host "rsync -atzP --no-perms --no-owner --no-group --quiet $jump_tmp_dir/$target_host/ $target_host:$target_dir"`;
+}
+
+#-----------------------------------------------------------------------------------------------------------------------
+# _get_tmp_dir()
+#-----------------------------------------------------------------------------------------------------------------------
+func _get_tmp_dir (Str $jump_host) {
+    my $jump_tmp_dir = `ssh $jump_host "mktemp -d -p /shared/tmp rsync.sek.XXXXXXXX"`;
+    chomp($jump_tmp_dir);
+    return $jump_tmp_dir;
+}
+
+#-----------------------------------------------------------------------------------------------------------------------
+# _rm_jump_tmp_dir()
+#-----------------------------------------------------------------------------------------------------------------------
+func _rm_jump_tmp_dir (Str $jump_host, Str $jump_tmp_dir) {
+    `ssh $jump_host "rm -rf $jump_tmp_dir"`;
+}
+
+main(@ARGV);
+
+1;
