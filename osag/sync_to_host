@@ -51,25 +51,21 @@ func main (Str $target_host) {
     my $source_dir   = _check_target_hosts($target_host);
     my $jump_tmp_dir = _get_tmp_dir($JUMP_HOST);
 
-    #say($jump_tmp_dir);
-    _source_to_jump( $source_dir, $JUMP_HOST, $jump_tmp_dir );
-    _jump_to_target( $JUMP_HOST, $jump_tmp_dir, $target_host, "/" );
+    _source_to_jump($source_dir, $JUMP_HOST, $jump_tmp_dir);
+    _jump_to_target($JUMP_HOST, $jump_tmp_dir, $target_host, "/");
 
-    _rm_jump_tmp_dir( $JUMP_HOST, $jump_tmp_dir );
+    _rm_jump_tmp_dir($JUMP_HOST, $jump_tmp_dir);
 }
 
 #-----------------------------------------------------------------------------------------------------------------------
 # _check_target_hosts()
 #-----------------------------------------------------------------------------------------------------------------------
 func _check_target_hosts (Str $target_host) {
-    my @hosts = grep { -e ( $TARGET_HOSTS_DIR . $_ ) } File::Slurper::read_dir($TARGET_HOSTS_DIR);
-
-    #say( Dumper( \@hosts ) );
-    if ( !grep { $_ eq $target_host } @hosts ) {
+    my @hosts = grep { -e ($TARGET_HOSTS_DIR . $_) } File::Slurper::read_dir($TARGET_HOSTS_DIR);
+    if (!grep { $_ eq $target_host } @hosts) {
         die("No directory in '$TARGET_HOSTS_DIR' for requested host '$target_host'.");
     }
 
-    #say("Directory in '$TARGET_HOSTS_DIR' for requested host '$target_host' found.");
     return $TARGET_HOSTS_DIR . $target_host;
 }
 
@@ -84,10 +80,6 @@ func _source_to_jump (Str $src, Str $jump_host, Str $jump_tmp_dir) {
 # _jump_to_target()
 #-----------------------------------------------------------------------------------------------------------------------
 func _jump_to_target (Str $jump_host, Str $jump_tmp_dir, Str $target_host, $target_dir) {
-
-    #say("$jump_tmp_dir/$target_host");
-    #say("$target_host:$target_dir");
-
     `ssh $jump_host "rsync -atzP --no-perms --no-owner --no-group --quiet $jump_tmp_dir/$target_host/ $target_host:$target_dir"`;
 }
 
