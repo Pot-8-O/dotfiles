@@ -80,7 +80,7 @@ func _source_to_jump (Str $src, Str $jump_host, Str $jump_tmp_dir) {
 # _jump_to_target()
 #-----------------------------------------------------------------------------------------------------------------------
 func _jump_to_target (Str $jump_host, Str $jump_tmp_dir, Str $target_host, $target_dir) {
-    `ssh $jump_host "rsync -atzP --no-perms --no-owner --no-group --quiet $jump_tmp_dir/$target_host/ $target_host:$target_dir"`;
+    `ssh $jump_host "rsync -atzP --no-perms --no-owner --no-group --no-times --quiet $jump_tmp_dir/$target_host/ $target_host:$target_dir"`;
 }
 
 #-----------------------------------------------------------------------------------------------------------------------
