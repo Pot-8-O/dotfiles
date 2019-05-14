@@ -23,7 +23,7 @@
 #   │           └── path
 #   │               └── on
 #   │                   └── host2
-#   └── sync_to_host
+#   └── sync_to_host (this file)
 #
 # Written by Severin Kistler <skistler@open-systems.com>, April 2019
 #
@@ -41,20 +41,33 @@ use Method::Signatures;
 
 # CONSTANTS ------------------------------------------------------------------------------------------------------------
 
-const my $JUMP_HOST        => "lamarr";
-const my $TARGET_HOSTS_DIR => dirname(__FILE__) . "/hosts/";
+const my $DEFAULT_JUMP_HOST => 'lamarr';
+const my $TARGET_HOSTS_DIR  => dirname(__FILE__) . '/hosts/';
+const my @JUMP_HOSTS        => ('lamarr', 'shannon', 'turing', 'zuse');
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 # main()
 #-----------------------------------------------------------------------------------------------------------------------
 func main (Str $target_host) {
-    my $source_dir   = _check_target_hosts($target_host);
-    my $jump_tmp_dir = _get_tmp_dir($JUMP_HOST);
+    my $jump_host;
+    my $source_dir    = _check_target_hosts($target_host);
+    my $jump_dir_name = $target_host;
 
-    _source_to_jump($source_dir, $JUMP_HOST, $jump_tmp_dir);
-    _jump_to_target($JUMP_HOST, $jump_tmp_dir, $target_host, "/");
+    if (grep { $_ eq $target_host } @JUMP_HOSTS) {
+        $jump_host   = $target_host;
+        $target_host = 'localhost';
+    }
+    else {
+        $jump_host = $DEFAULT_JUMP_HOST;
+    }
 
-    _rm_jump_tmp_dir($JUMP_HOST, $jump_tmp_dir);
+    my $jump_tmp_dir = _get_tmp_dir($jump_host);
+
+    _source_to_jump($source_dir, $jump_host, $jump_tmp_dir);
+    _jump_to_target($jump_host, $jump_tmp_dir . '/' . $jump_dir_name, $target_host, '/');
+
+    _rm_jump_tmp_dir($jump_host, $jump_tmp_dir);
 }
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -79,15 +92,15 @@ func _source_to_jump (Str $src, Str $jump_host, Str $jump_tmp_dir) {
 #-----------------------------------------------------------------------------------------------------------------------
 # _jump_to_target()
 #-----------------------------------------------------------------------------------------------------------------------
-func _jump_to_target (Str $jump_host, Str $jump_tmp_dir, Str $target_host, $target_dir) {
-    `ssh $jump_host "rsync -atzP --no-perms --no-owner --no-group --no-times --quiet $jump_tmp_dir/$target_host/ $target_host:$target_dir"`;
+func _jump_to_target (Str $jump_host, Str $jump_dir, Str $target_host, $target_dir) {
+    `ssh $jump_host 'rsync -atzP --no-perms --no-owner --no-group --no-times --quiet $jump_dir/ $target_host:$target_dir'`;
 }
 
 #-----------------------------------------------------------------------------------------------------------------------
 # _get_tmp_dir()
 #-----------------------------------------------------------------------------------------------------------------------
 func _get_tmp_dir (Str $jump_host) {
-    my $jump_tmp_dir = `ssh $jump_host "mktemp -d -p /shared/tmp rsync.sek.XXXXXXXX"`;
+    my $jump_tmp_dir = `ssh $jump_host 'mktemp -d -p /shared/tmp rsync.sek.XXXXXX'`;
     chomp($jump_tmp_dir);
     return $jump_tmp_dir;
 }
@@ -96,7 +109,7 @@ func _get_tmp_dir (Str $jump_host) {
 # _rm_jump_tmp_dir()
 #-----------------------------------------------------------------------------------------------------------------------
 func _rm_jump_tmp_dir (Str $jump_host, Str $jump_tmp_dir) {
-    `ssh $jump_host "rm -rf $jump_tmp_dir"`;
+    `ssh $jump_host 'rm -rf $jump_tmp_dir'`;
 }
 
 main(@ARGV);
