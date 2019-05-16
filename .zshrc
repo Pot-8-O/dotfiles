@@ -88,6 +88,10 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
+# make bash completions usable (provides complete command)
+autoload bashcompinit
+bashcompinit
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"

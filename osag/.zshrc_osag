@@ -8,7 +8,6 @@ function upload_pkg_files_to_host {
   
     for FILE in "${@:2}"; do
         NEW_PATH=`grealpath $FILE | sed -e 's!.*pkg-osag!/opt/OSAG!'`               # path replacement from local path to host path
-cd .
         NEW_PATH=`echo "$NEW_PATH" | sed -e 's!\(OSAGnurs3/\)addon!\1etc!'`         # path replacement for OSAGnurs3 addon files
         NEW_PATH=`echo "$NEW_PATH" | sed -e 's!\(OSAGnurs3/\)nurse/lib!\1perl!'`    # path replacement for OSAGnurs3 lib files
 
@@ -22,13 +21,23 @@ cd .
 
 function copy_to_host {
     TMP=`ssh lamarr "mktemp -d -p /shared/tmp rsync.sek.XXXXXXXX"`
-    rsync -avz --quiet $1 lamarr:$TMP;
-    ssh lamarr "rsync -rlt --checksum -vz --no-perms --no-owner --no-group --quiet $TMP/ $2";
+    rsync -avz --quiet $1 lamarr:$TMP
+    ssh lamarr "rsync -rlt --checksum -vz --no-perms --no-owner --no-group --quiet $TMP/ $2"
+    ssh lamarr "rm -rf $TMP"
+}
+
+function copy_from_host {
+    TMP=`ssh lamarr "mktemp -d -p /shared/tmp rsync.sek.XXXXXXXX"`
+    ssh lamarr "rsync -rlt --checksum -vz --no-perms --no-owner --no-group --quiet $1 $TMP"
+    rsync -avz --quiet lamarr:$TMP/ $2
     ssh lamarr "rm -rf $TMP";
 }
 
 export PATH=/Users/sek/.host_sync:$PATH
-echo $P
 export GOPATH=/Users/sek/go/
 
 source ~/perl5/perlbrew/etc/bashrc
+
+# bash-auto-completion for sync_to_host
+_SYNC_TO_HOST_TARGETS=$(ls ~/.host_sync/hosts)
+complete -W "$(ls ~/.host_sync/hosts)" 'sync_to_host'
