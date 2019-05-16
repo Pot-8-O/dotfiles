@@ -49,25 +49,30 @@ const my @JUMP_HOSTS        => ('lamarr', 'shannon', 'turing', 'zuse');
 #-----------------------------------------------------------------------------------------------------------------------
 # main()
 #-----------------------------------------------------------------------------------------------------------------------
-func main (Str $target_host) {
-    my $jump_host;
-    my $source_dir    = _check_target_hosts($target_host);
-    my $jump_dir_name = $target_host;
+func main (ArrayRef[Str] $target_hosts) {
+    for my $target_host (@$target_hosts) {
 
-    if (grep { $_ eq $target_host } @JUMP_HOSTS) {
-        $jump_host   = $target_host;
-        $target_host = 'localhost';
+        my $jump_host;
+        my $source_dir    = _check_target_hosts($target_host);
+        my $jump_dir_name = $target_host;
+
+        if (grep { $_ eq $target_host } @JUMP_HOSTS) {
+            $jump_host   = $target_host;
+            $target_host = 'localhost';
+            say("Rsyncing to $target_host on jump host $jump_host");
+        }
+        else {
+            $jump_host = $DEFAULT_JUMP_HOST;
+            say("Rsyncing to $target_host via jump host $jump_host");
+        }
+
+        my $jump_tmp_dir = _get_tmp_dir($jump_host);
+
+        _source_to_jump($source_dir, $jump_host, $jump_tmp_dir);
+        _jump_to_target($jump_host, $jump_tmp_dir . '/' . $jump_dir_name, $target_host, '/');
+
+        _rm_jump_tmp_dir($jump_host, $jump_tmp_dir);
     }
-    else {
-        $jump_host = $DEFAULT_JUMP_HOST;
-    }
-
-    my $jump_tmp_dir = _get_tmp_dir($jump_host);
-
-    _source_to_jump($source_dir, $jump_host, $jump_tmp_dir);
-    _jump_to_target($jump_host, $jump_tmp_dir . '/' . $jump_dir_name, $target_host, '/');
-
-    _rm_jump_tmp_dir($jump_host, $jump_tmp_dir);
 }
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -112,6 +117,6 @@ func _rm_jump_tmp_dir (Str $jump_host, Str $jump_tmp_dir) {
     `ssh $jump_host 'rm -rf $jump_tmp_dir'`;
 }
 
-main(@ARGV);
+main(\@ARGV);
 
 1;
