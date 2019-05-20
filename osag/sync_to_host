@@ -44,6 +44,8 @@ use Method::Signatures;
 const my $DEFAULT_JUMP_HOST => 'lamarr';
 const my $TARGET_HOSTS_DIR  => dirname(__FILE__) . '/hosts/';
 const my @JUMP_HOSTS        => ('lamarr', 'shannon', 'turing', 'zuse');
+const my $RSYNC_JUMP_BASE   => '/shared/tmp';
+const my $RSYNC_JUMP_PREFIX => 'rsync.sek';
 
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -66,12 +68,10 @@ func main (ArrayRef[Str] $target_hosts) {
             say("Rsyncing to $target_host via jump host $jump_host");
         }
 
-        my $jump_tmp_dir = _get_tmp_dir($jump_host);
+        my $jump_rsync_dir = _get_jump_rsync_dir($jump_host);
 
-        _source_to_jump($source_dir, $jump_host, $jump_tmp_dir);
-        _jump_to_target($jump_host, $jump_tmp_dir . '/' . $jump_dir_name, $target_host, '/');
-
-        _rm_jump_tmp_dir($jump_host, $jump_tmp_dir);
+        _source_to_jump($source_dir, $jump_host, $jump_rsync_dir);
+        _jump_to_target($jump_host, $jump_rsync_dir . '/' . $jump_dir_name, $target_host, '/');
     }
 }
 
@@ -90,31 +90,29 @@ func _check_target_hosts (Str $target_host) {
 #-----------------------------------------------------------------------------------------------------------------------
 # _source_to_jump()
 #-----------------------------------------------------------------------------------------------------------------------
-func _source_to_jump (Str $src, Str $jump_host, Str $jump_tmp_dir) {
-    `rsync -atzPL $src $jump_host:$jump_tmp_dir`;
+func _source_to_jump (Str $src, Str $jump_host, Str $jump_rsync_dir) {
+    `rsync -atzPL --delete --quiet $src $jump_host:$jump_rsync_dir`;
 }
 
 #-----------------------------------------------------------------------------------------------------------------------
 # _jump_to_target()
 #-----------------------------------------------------------------------------------------------------------------------
 func _jump_to_target (Str $jump_host, Str $jump_dir, Str $target_host, $target_dir) {
-    `ssh $jump_host 'rsync -atzP --no-perms --no-owner --no-group --no-times --quiet $jump_dir/ $target_host:$target_dir'`;
+    `ssh $jump_host 'rsync -atzP --no-perms --no-owner --no-group --quiet $jump_dir/ $target_host:$target_dir'`;
 }
 
 #-----------------------------------------------------------------------------------------------------------------------
-# _get_tmp_dir()
+# _get_jump_rsync_dir()
 #-----------------------------------------------------------------------------------------------------------------------
-func _get_tmp_dir (Str $jump_host) {
-    my $jump_tmp_dir = `ssh $jump_host 'mktemp -d -p /shared/tmp rsync.sek.XXXXXX'`;
-    chomp($jump_tmp_dir);
-    return $jump_tmp_dir;
-}
+func _get_jump_rsync_dir (Str $jump_host) {
+    my $jump_rsync_dir = `ssh $jump_host 'find $RSYNC_JUMP_BASE -maxdepth 1 -name $RSYNC_JUMP_PREFIX.*'`;
 
-#-----------------------------------------------------------------------------------------------------------------------
-# _rm_jump_tmp_dir()
-#-----------------------------------------------------------------------------------------------------------------------
-func _rm_jump_tmp_dir (Str $jump_host, Str $jump_tmp_dir) {
-    `ssh $jump_host 'rm -rf $jump_tmp_dir'`;
+    if (!$jump_rsync_dir) {
+        $jump_rsync_dir = `ssh $jump_host 'mktemp -d -p $RSYNC_JUMP_BASE $RSYNC_JUMP_PREFIX.XXXXXX'`;
+    }
+
+    chomp($jump_rsync_dir);
+    return $jump_rsync_dir;
 }
 
 main(\@ARGV);
