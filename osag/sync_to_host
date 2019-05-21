@@ -61,11 +61,11 @@ func main (ArrayRef[Str] $target_hosts) {
         if (grep { $_ eq $target_host } @JUMP_HOSTS) {
             $jump_host   = $target_host;
             $target_host = 'localhost';
-            say("Rsyncing to $target_host on jump host $jump_host");
+            say("Rsyncing to $target_host on jump host $jump_host -- $source_dir");
         }
         else {
             $jump_host = $DEFAULT_JUMP_HOST;
-            say("Rsyncing to $target_host via jump host $jump_host");
+            say("Rsyncing to $target_host via jump host $jump_host -- $source_dir");
         }
 
         my $jump_rsync_dir = _get_jump_rsync_dir($jump_host);
