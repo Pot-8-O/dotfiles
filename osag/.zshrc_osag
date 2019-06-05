@@ -22,6 +22,16 @@ source ~/perl5/perlbrew/etc/bashrc
 function _get_sync_to_host_targets () {
     ls ~/.host_sync/hosts
 }
-
 # bash-auto-completion for sync_to_host
 complete -F _get_sync_to_host_targets 'sync_to_host'
+
+function get_sftp_command_osix11 {
+    INPUT=$(echo "$1" | sed -E 's/^\[?//' | sed -E 's/\]?#?$//')
+    CONTAINER_ID=$(echo "$INPUT" | sed -E 's/:.*//' | sed -E 's/[a-z0-9]+-[a-z0-9]+-//')
+    PACKAGE=$(basename $(echo "$INPUT" | sed -E 's/.*://'))
+    SOURCE=pkgget@build-r29-osix11-1:output/${PACKAGE}_${CONTAINER_ID}/
+    DEST=/shared/tmp/sek/
+    CMD="mkdir -p $DEST; sftp $SOURCE* $DEST"
+    echo "$CMD" | pbcopy
+    echo "command copied to clipboard"
+}
