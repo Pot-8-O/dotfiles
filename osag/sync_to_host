@@ -5,7 +5,7 @@
 # sync_to_host
 #       sync local directory named after osag host via jump to that host (using rsync).
 #       local directory can be filled with folder structure of the target.
-#       local directory can be filled with files and symlink, which will be copied as data, not as links
+#       local directory can be filled with files and symlinks, which will be copied as data, not as links
 #           (-L, --copy-links) in rsync
 #
 #   folder structure should look like:
@@ -29,24 +29,20 @@
 #
 #######################################################################################################################
 
-
 use v5.16;
 use warnings;
 
 use Const::Fast;
 use Data::Dumper;
 use File::Basename;
-use File::Slurper;
+use File::Slurper qw(read_dir);
 use Method::Signatures;
 
 # CONSTANTS ------------------------------------------------------------------------------------------------------------
 
 const my $DEFAULT_JUMP_HOST => 'lamarr';
 const my $TARGET_HOSTS_DIR  => dirname(__FILE__) . '/hosts/';
-const my @JUMP_HOSTS        => ('lamarr', 'shannon', 'turing', 'zuse');
-const my $RSYNC_JUMP_BASE   => '/shared/tmp';
-const my $RSYNC_JUMP_PREFIX => 'rsync.sek';
-
+const my $JUMP_HOSTS        => ['lamarr', 'shannon', 'turing', 'zuse'];
 
 #-----------------------------------------------------------------------------------------------------------------------
 # main()
@@ -57,7 +53,7 @@ func main (ArrayRef[Str] $target_hosts) {
         my $jump_host;
         my $source_dir = _check_target_hosts($target_host);
 
-        if (grep { $_ eq $target_host } @JUMP_HOSTS) {
+        if (grep { $_ eq $target_host } @$JUMP_HOSTS) {
             $jump_host   = $target_host;
             $target_host = 'localhost';
             say("Rsyncing to $target_host on jump host $jump_host -- $source_dir");
@@ -75,12 +71,9 @@ func main (ArrayRef[Str] $target_hosts) {
 # _check_target_hosts()
 #-----------------------------------------------------------------------------------------------------------------------
 func _check_target_hosts (Str $target_host) {
-    my @hosts = grep { -e ($TARGET_HOSTS_DIR . $_) } File::Slurper::read_dir($TARGET_HOSTS_DIR);
-    if (!grep { $_ eq $target_host } @hosts) {
-        die("No directory in '$TARGET_HOSTS_DIR' for requested host '$target_host'.");
-    }
-
-    return $TARGET_HOSTS_DIR . $target_host;
+    my $source_dir = $TARGET_HOSTS_DIR . $target_host;
+    die("No directory in '$TARGET_HOSTS_DIR' for requested host '$target_host'.") unless (-d $source_dir);
+    return $source_dir;
 }
 
 #-----------------------------------------------------------------------------------------------------------------------

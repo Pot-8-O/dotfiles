@@ -26,12 +26,18 @@ function _get_sync_to_host_targets () {
 complete -F _get_sync_to_host_targets 'sync_to_host'
 
 function get_sftp_command_osix11 {
+    if [ $# -lt 1 ]; then
+        echo "Usage: $0 <build host command prompt line>"
+        return
+    fi
+    
     INPUT=$(echo "$1" | sed -E 's/^\[?//' | sed -E 's/\]?#?$//')
-    CONTAINER_ID=$(echo "$INPUT" | sed -E 's/:.*//' | sed -E 's/[a-z0-9]+-[a-z0-9]+-//')
-    PACKAGE=$(basename $(echo "$INPUT" | sed -E 's/.*://'))
+    CONTAINER_ID=$(echo "$INPUT" | cut -d: -f1 | sed -E 's/[a-z0-9]+-[a-z0-9]+-//')
+    PACKAGE=$(basename $(echo "$INPUT" | cut -d: -f2))
     SOURCE=pkgget@build-r29-osix11-1:output/${PACKAGE}_${CONTAINER_ID}/
     DEST=/shared/tmp/sek/
+
     CMD="mkdir -p $DEST; sftp $SOURCE* $DEST"
     echo "$CMD" | pbcopy
-    echo "command copied to clipboard"
+    echo "sftp command copied to clipboard"
 }

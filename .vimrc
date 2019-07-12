@@ -98,3 +98,8 @@ let g:lightline = {
 
 let g:javascript_plugin_flow = 1
 let NERDTreeShowHidden = 1
+" INFRA-9620 / CVE-2019-06-04
+" Please leave this as the LAST LINE in your .vimrc
+" This is a temporary kludge fix until Apple updates bundled vim package
+" <3 Infra
+set nomodeline
