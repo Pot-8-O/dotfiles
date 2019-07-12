@@ -41,7 +41,7 @@ use Method::Signatures;
 # CONSTANTS ------------------------------------------------------------------------------------------------------------
 
 const my $DEFAULT_JUMP_HOST => 'lamarr';
-const my $TARGET_HOSTS_DIR  => dirname(__FILE__) . '/hosts/';
+const my $TARGET_HOSTS_DIR  => $ENV{HOSTS_SYNC_DIR} . '/' . $ENV{HOSTS_SYNC_TARGETS_DIR};
 const my $JUMP_HOSTS        => ['lamarr', 'shannon', 'turing', 'zuse'];
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ func main (ArrayRef[Str] $target_hosts) {
 # _check_target_hosts()
 #-----------------------------------------------------------------------------------------------------------------------
 func _check_target_hosts (Str $target_host) {
-    my $source_dir = $TARGET_HOSTS_DIR . $target_host;
+    my $source_dir = $TARGET_HOSTS_DIR . '/' . $target_host;
     die("No directory in '$TARGET_HOSTS_DIR' for requested host '$target_host'.") unless (-d $source_dir);
     return $source_dir;
 }
@@ -80,7 +80,7 @@ func _check_target_hosts (Str $target_host) {
 # _rsync_via_jump()
 #-----------------------------------------------------------------------------------------------------------------------
 func _rsync_via_jump (Str $source, Str $jump_host, Str $target_host, $target_dir) {
-    `rsync -atzPL --no-perms --no-owner --no-group --quiet --rsh "ssh $jump_host ssh" $source/ $target_host:$target_dir`;
+    `rsync -atzPL --no-perms --no-owner --no-group --quiet --stats --rsh "ssh $jump_host ssh" $source/ $target_host:$target_dir`;
 }
 
 main(\@ARGV);
