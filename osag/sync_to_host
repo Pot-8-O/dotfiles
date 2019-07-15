@@ -33,9 +33,6 @@ use v5.16;
 use warnings;
 
 use Const::Fast;
-use Data::Dumper;
-use File::Basename;
-use File::Slurper qw(read_dir);
 use Method::Signatures;
 
 # CONSTANTS ------------------------------------------------------------------------------------------------------------
