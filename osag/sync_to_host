@@ -37,9 +37,9 @@ use Method::Signatures;
 
 # CONSTANTS ------------------------------------------------------------------------------------------------------------
 
-const my $DEFAULT_JUMP_HOST => 'lamarr';
+const my $DEFAULT_JUMP_HOST => 'shannon';
 const my $TARGET_HOSTS_DIR  => $ENV{HOSTS_SYNC_DIR} . '/' . $ENV{HOSTS_SYNC_TARGETS_DIR};
-const my $JUMP_HOSTS        => ['lamarr', 'shannon', 'turing', 'zuse'];
+const my $JUMP_HOSTS        => ['zuse', 'shannon', 'lamarr', 'turing'];
 
 #-----------------------------------------------------------------------------------------------------------------------
 # main()
