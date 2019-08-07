@@ -123,6 +123,8 @@ bashcompinit
 
 abspath() { for f in "$@"; do echo ${f}(:A); done }
 
+alias fireworks="printf '\e]1337;%s\a' RequestAttention=fireworks"
+
 source ~/.zshrc_mac
 source ~/.zshrc_osag
 
