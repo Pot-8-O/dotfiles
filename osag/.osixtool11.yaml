@@ -1,0 +1,3 @@
+buildhost: stretch-1
+user: build
+jumphost: zuse

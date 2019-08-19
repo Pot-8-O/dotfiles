@@ -4,7 +4,8 @@ export no_proxy=".open.ch"
 
 source ~/perl5/perlbrew/etc/bashrc
 
-export GOPATH=/Users/sek/go/
+export GOPATH=~/go/
+PATH=$PATH:$GOPATH/bin
 
 function copy_to_host {
     rsync_via_jump lamarr $@
