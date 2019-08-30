@@ -21,15 +21,16 @@ function rsync_via_jump {
 
 export HOSTS_SYNC_DIR=~/.host_sync
 export HOSTS_SYNC_TARGETS_DIR=hosts
-export HOSTS_SYNC_EXE_NAME=sync_to_host
+export HOSTS_SYNC_EXE=sync_to_host
 
 export PATH=$HOSTS_SYNC_DIR:$PATH
 
-function _get_host_sync_targets () {
+function _complete_sync_to_host () {    
     ls $HOSTS_SYNC_DIR/$HOSTS_SYNC_TARGETS_DIR
 }
-# bash-auto-completion for HOSTS_SYNC_EXE_NAME
-complete -F _get_host_sync_targets $HOSTS_SYNC_EXE_NAME
+
+# bash-auto-completion for HOSTS_SYNC_EXE and HOSTS_SYNC_CREATE_EXE
+complete -F _complete_sync_to_host $HOSTS_SYNC_EXE
 
 function get_sftp_command_osix11 {
     if [ $# -lt 1 ]; then

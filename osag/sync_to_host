@@ -9,7 +9,7 @@
 #           (-L, --copy-links) in rsync
 #
 #   folder structure should look like:
-#   .
+#   $ENV{HOSTS_SYNC_DIR}/$ENV{HOSTS_SYNC_TARGETS_DIR}
 #   ├── hosts
 #   │   ├── host1_name
 #   │   │   └── absolute
