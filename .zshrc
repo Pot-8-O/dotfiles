@@ -1,8 +1,9 @@
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/sek/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -26,7 +27,7 @@ if [[ $ZSH_THEME = "bullet-train" ]]; then
         cmd_exec_time
     )
     BULLETTRAIN_DIR_EXTENDED=2
-    BULLETTRAIN_CONTEXT_DEFAULT_USER="sek"
+    BULLETTRAIN_CONTEXT_DEFAULT_USER="$USER"
 
     CUSTOM_GIT_SHORT_BRANCH="short"
     CUSTOM_GIT_SHORT_BRANCH_LENGTH=90
@@ -127,6 +128,14 @@ weather() { curl v2.wttr.in/${1:-Zurich}; }
 
 alias fireworks="printf '\e]1337;%s\a' RequestAttention=fireworks"
 
-source ~/.zshrc_mac
-source ~/.zshrc_osag
+source ~/.zshrc_linux
+# source ~/.zshrc_mac
+# source ~/.zshrc_osag
 
+
+# algolab
+source ~/.algolab-bashrc.bash
+
+# alias for c++ compilation for algolab
+alias gd='g++ -g -std=c++11 -Wall -Wextra -Wpedantic'
+alias gf='g++ -O3 -std=c++11 -Wall -Wextra -Wpedantic'
