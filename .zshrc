@@ -134,8 +134,12 @@ source ~/.zshrc_linux
 
 
 # algolab
-source ~/.algolab-bashrc.bash
+source ~/.algolabVS-bashrc.bash
 
 # alias for c++ compilation for algolab
 alias gd='g++ -g -std=c++11 -Wall -Wextra -Wpedantic'
 alias gf='g++ -O3 -std=c++11 -Wall -Wextra -Wpedantic'
+
+# vtune
+source ~/intel/vtune_amplifier_2019/amplxe-vars.sh
+alias vtune='amplxe-gui &'
