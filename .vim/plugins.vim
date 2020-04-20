@@ -12,3 +12,7 @@ Plug 'tpope/vim-surround'
 Plug 'w0rp/ale'
 Plug 'morhetz/gruvbox'
 call plug#end()
+autocmd VimEnter *
+  \  if !empty(filter(copy(g:plugs), '!isdirectory(v:val.dir)'))
+  \|   PlugInstall
+  \| endif
