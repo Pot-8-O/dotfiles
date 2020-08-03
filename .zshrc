@@ -1,3 +1,10 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
@@ -9,7 +16,8 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="bullet-train"
+# ZSH_THEME="bullet-train"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
 if [[ $ZSH_THEME = "bullet-train" ]]; then
     BULLETTRAIN_PROMPT_ORDER=(
@@ -28,9 +36,6 @@ if [[ $ZSH_THEME = "bullet-train" ]]; then
     )
     BULLETTRAIN_DIR_EXTENDED=2
     BULLETTRAIN_CONTEXT_DEFAULT_USER="$USER"
-
-    CUSTOM_GIT_SHORT_BRANCH="short"
-    CUSTOM_GIT_SHORT_BRANCH_LENGTH=90
 fi
 if [[ "$user" != "$DEFAULT_USER" || -n "$SSH_CONNECTION" ]]; then
   export BULLETTRAIN_IS_SSH_CLIENT=true
@@ -131,10 +136,14 @@ weather() { curl v2.wttr.in/${1:-Zurich}; }
 
 alias fireworks="printf '\e]1337;%s\a' RequestAttention=fireworks"
 
-source ~/.zshrc_linux
-# source ~/.zshrc_mac
-# source ~/.zshrc_osag
+[[ ! -f .zshrc_linux ]] || source ~/.zshrc_linux
+[[ ! -f .zshrc_mac ]] || source ~/.zshrc_mac
 
 # vtune
 # source ~/intel/vtune_amplifier_2019/amplxe-vars.sh
 # alias vtune='amplxe-gui &'
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+source ~/.terminal-magic/env
