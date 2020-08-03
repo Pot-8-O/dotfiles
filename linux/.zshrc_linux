@@ -3,3 +3,7 @@ export PATH=/home/sk/.local/bin:$PATH
 pdfopen() {
     gio open $1 >/dev/null 2>&1
 }
+
+export VISUAL=vim
+export GIT_EDITOR="$VISUAL" 
+export EDITOR="$VISUAL" 

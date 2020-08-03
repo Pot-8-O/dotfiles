@@ -32,6 +32,9 @@ if [[ $ZSH_THEME = "bullet-train" ]]; then
     CUSTOM_GIT_SHORT_BRANCH="short"
     CUSTOM_GIT_SHORT_BRANCH_LENGTH=90
 fi
+if [[ "$user" != "$DEFAULT_USER" || -n "$SSH_CONNECTION" ]]; then
+  export BULLETTRAIN_IS_SSH_CLIENT=true
+fi
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load

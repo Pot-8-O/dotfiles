@@ -6,12 +6,8 @@ set noerrorbells
 set mouse=a
 set ttymouse=xterm2
 set so=999
-set clipboard=unnamedplus
+set clipboard^=unnamed,unnamedplus
 set wildmenu
-
-if has('mac')
-    set clipboard=unnamed
-endif
 
 " Appearance "
 
